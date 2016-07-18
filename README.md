@@ -7,9 +7,8 @@ Benchviz is a tool that hooks up to an s3 instance and deploys daily benchmark s
 3. Setup aws to be connected with your account.
 4. Set the following environment variables:
 
->AWSBUCKETNAME=\<name of your aws bucket\>
+>AWSBUCKETNAME=\<name of your aws bucket\><br/>
 >BENCHDEPLOY=\<full path to s3 mirror\><br/>
->MYROOT=\<full path to your cockroach directory\> 
 >BENCHSAMPLES=\<full path to your bench stat data\>
 >
         

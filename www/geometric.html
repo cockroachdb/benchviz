@@ -1,0 +1,51 @@
+<!--
+Copyright 2016 The Cockroach Authors.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied. See the License for the specific language governing
+permissions and limitations under the License.
+
+Author: William Haack (will@cockroachlabs.com)
+!-->
+<!doctype html>
+<head>
+  <title>Geometric Mean Graphs</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <script   src="https://code.jquery.com/jquery-1.12.2.min.js"   integrity="sha256-lZFHibXzMHo3GGeehn1hudTAP3Sc0uKXBXAzHX1sjtk="   crossorigin="anonymous"></script>  
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script> 
+</head>
+<html>
+  <h1 align="center" id="dirName"></h1>
+  <div align="center">
+    This page displays a graph of the geometric means of the results from all the tests in the directory for the listed dates.<br/>
+    <a href="index.html">home</a><br/>
+  </div>
+  <div class="container">
+    <div class="row row-centered">
+      <div class="col-md-6 col-centered" id="NPlot" style="width: 480px; height: 400px;"></div>
+      <div class="col-md-6 col-centered" id="APlot" style="width: 480px; height: 400px;"></div>
+    </div>
+    <br/><br/><br/><br/>
+    <div class="row">
+      <div class="col-md-6 col-centered" id="BPlot" style="width: 480px; height: 400px;"></div>
+      <div class="col-md-6 col-centered" id="MPlot" style="width: 480px; height: 400px;"></div>
+    </div>
+  </div>
+  <script src="common.js"></script>
+  <script src="generate_benchmark_means.js"></script>
+</html>

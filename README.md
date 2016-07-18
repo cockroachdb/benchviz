@@ -31,4 +31,4 @@ Benchsamples is a directory that contains folders filled with historical benchma
 ....../util<br/>
 ../03--01-2016<br/>
 
-The important thing to note is that the directory must be named the date of the commit where the results were received from in DD-MM-YYYY format. In addition, the directory must store the results of benchmark tests in the directories that have benchmark tests under the name \<directory\>.test.stdout. This directory hierarchy is designed in this way because this is the format that we have our current historical benchmark data in. 
+Important note: the directory must be named the date of the commit where the results were received from in DD-MM-YYYY format. In addition, the directory must store the results of benchmark tests in the directories that have benchmark tests under the name \<directory\>.test.stdout. This directory hierarchy is designed in this way because this is the format that we have our current historical benchmark data in. 

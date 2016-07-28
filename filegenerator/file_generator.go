@@ -121,14 +121,27 @@ func isValidDataDir(dataDirName string) bool {
 	return matched
 }
 
+func mustGetEnv(envName string) string {
+	envVar := os.Getenv(envName)
+	if envVar == "" {
+		log.Fatalf("The env variable %s is not set.", envVar)
+	}
+	return envVar
+}
+
+// SyncWithAWS downloads the unorganized data from s3.
+func SyncWithAWS() {
+	benchSamples := mustGetEnv(benchSamplesEnv)
+	awsBucketName := mustGetEnv(awsBucketNameEnv)
+	cmd := exec.Command("aws", "s3", "sync", "s3://"+awsBucketName+"/benchHistoricalData", benchSamples)
+	runWithStandardOutputs(cmd)
+}
+
 // RenderHistoricalBenchmarkResults takes the folders in benchSamples, parses them, and returns a
 // data structure called BenchPackages which represent the data from the folders.
 func RenderHistoricalBenchmarkResults(dirs []string) BenchPackages {
 	dirToTestNames := make(BenchPackages)
-	benchSamples := os.Getenv(benchSamplesEnv)
-	if benchSamples == "" {
-		log.Fatalf("The env variable %s is not set.", benchSamplesEnv)
-	}
+	benchSamples := mustGetEnv(benchSamplesEnv)
 	dataDirs, err := ioutil.ReadDir(benchSamples)
 	check(err)
 	for _, dataDir := range dataDirs {
@@ -175,7 +188,7 @@ func RenderHistoricalBenchmarkResults(dirs []string) BenchPackages {
 // GenerateJSONFiles takes a BenchPackages and creates a json file for every test
 // containing its benchmark results data over time.
 func GenerateJSONFiles(packages BenchPackages) {
-	deployRoot := os.Getenv(deployRootEnv)
+	deployRoot := mustGetEnv(deployRootEnv)
 	for dir := range packages {
 		for testName := range packages[dir] {
 			testData := packages[dir][testName]
@@ -190,7 +203,7 @@ func GenerateJSONFiles(packages BenchPackages) {
 // GenerateTestNameJSONFile creates a JSON file that represents a map of
 // directories to a list of all of the benchmark tests in that directory.
 func GenerateTestNameJSONFile(packages BenchPackages) {
-	deployRoot := os.Getenv(deployRootEnv)
+	deployRoot := mustGetEnv(deployRootEnv)
 	testPackageToName := make(map[string][]string)
 	for packageName := range packages {
 		testPackageToName[packageName] = make([]string,
@@ -224,7 +237,7 @@ func getDatesFromPackages(packages BenchPackages) []string {
 // GenerateGeometricMeanJSONFile creates a JSON file that has the geometric mean of
 // the results from every benchmark test in a package for every package.
 func GenerateGeometricMeanJSONFile(packages BenchPackages, dirs []string) {
-	deployRoot := os.Getenv(deployRootEnv)
+	deployRoot := mustGetEnv(deployRootEnv)
 	dates := getDatesFromPackages(packages)
 	packageToGeometricMean := make(map[string][]GeometricMeanData)
 	for _, dir := range dirs {
@@ -272,7 +285,7 @@ func GetGeometricMean(vector []float64) float64 {
 // CopyWWW copies the files in the www directory into the aws deploy directory
 // to be deployed to s3.
 func CopyWWW() {
-	deployRoot := os.Getenv(deployRootEnv)
+	deployRoot := mustGetEnv(deployRootEnv)
 	wd, err := os.Getwd()
 	check(err)
 	fileNames := []string{"common.js", "generate_benchmark_means.js", "generate_benchmark_list.js",
@@ -286,8 +299,8 @@ func CopyWWW() {
 // PublishToAWS uploads the files in the aws deploy directory to the configured
 // s3 instance.
 func PublishToAWS() {
-	deployRoot := os.Getenv(deployRootEnv)
-	awsBucketName := os.Getenv(awsBucketNameEnv)
+	deployRoot := mustGetEnv(deployRootEnv)
+	awsBucketName := mustGetEnv(awsBucketNameEnv)
 	cmd := exec.Command("aws", "s3", "sync", deployRoot, "s3://"+awsBucketName, "--acl", "public-read")
 	runWithStandardOutputs(cmd)
 }

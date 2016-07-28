@@ -19,6 +19,7 @@ package main
 import "github.com/benchviz/filegenerator"
 
 func main() {
+	filegenerator.SyncWithAWS()
 	dirs := []string{"sql", "sql/parser", "kv", "roachpb", "storage",
 		"storage/engine", "util/cache", "util/caller", "util/decimal",
 		"util/encoding", "util/interval", "util/log"}

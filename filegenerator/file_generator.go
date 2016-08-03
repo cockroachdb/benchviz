@@ -28,7 +28,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"log"
-	"math"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -62,16 +61,6 @@ type BenchStats struct {
 	A int     // alllocs/op
 	B int     // B/op
 	M float64 // MB/s
-}
-
-// GeometricMeanData is a struct that contains the means of the benchmark
-// stats for all the tests in a given package.
-type GeometricMeanData struct {
-	NMean float64 // Mean of the ns/op result from all tests in a package.
-	AMean float64 // Mean of the allocs/op result from all tests in a package.
-	BMean float64 // Mean of the B/op result from all tests in a package.
-	MMean float64 // Mean of the MB/s result from all tests in a package.
-	Date  string  // The date that the mean of all tests was collected.
 }
 
 func check(err error) {
@@ -234,62 +223,14 @@ func getDatesFromPackages(packages BenchPackages) []string {
 	return dates
 }
 
-// GenerateGeometricMeanJSONFile creates a JSON file that has the geometric mean of
-// the results from every benchmark test in a package for every package.
-func GenerateGeometricMeanJSONFile(packages BenchPackages, dirs []string) {
-	deployRoot := mustGetEnv(deployRootEnv)
-	dates := getDatesFromPackages(packages)
-	packageToGeometricMean := make(map[string][]GeometricMeanData)
-	for _, dir := range dirs {
-		packageToGeometricMean[dir] = make([]GeometricMeanData, 0)
-		for _, date := range dates {
-			vectors := make(map[string][]float64)
-			for _, test := range packages[dir] {
-				vectors["N"] = append(vectors["N"], float64(test[date].N))
-				vectors["A"] = append(vectors["A"], float64(test[date].A))
-				vectors["B"] = append(vectors["B"], float64(test[date].B))
-				vectors["M"] = append(vectors["M"], float64(test[date].M))
-			}
-			nMean := GetGeometricMean(vectors["N"])
-			aMean := GetGeometricMean(vectors["A"])
-			bMean := GetGeometricMean(vectors["B"])
-			mMean := GetGeometricMean(vectors["M"])
-			packageToGeometricMean[dir] = append(packageToGeometricMean[dir],
-				GeometricMeanData{NMean: nMean, AMean: aMean, BMean: bMean, MMean: mMean, Date: date})
-		}
-	}
-	fileName := filepath.Join(deployRoot, "geometric_means.json")
-	geometricMeansJSON, err := json.Marshal(&packageToGeometricMean)
-	check(err)
-	check(ioutil.WriteFile(fileName, geometricMeansJSON, 0644))
-}
-
-// GetGeometricMean returns the geometric mean of a vector.
-func GetGeometricMean(vector []float64) float64 {
-	epsilon := .0001
-	sum := 0.0
-	size := 0
-	/// Use law of logs to avoid overflows when multiplying entire vector.
-	for _, num := range vector {
-		if num > epsilon {
-			sum += math.Log(num)
-			size++
-		}
-	}
-	if size == 0 {
-		return 0
-	}
-	return math.Exp(sum / float64(size))
-}
-
 // CopyWWW copies the files in the www directory into the aws deploy directory
 // to be deployed to s3.
 func CopyWWW() {
 	deployRoot := mustGetEnv(deployRootEnv)
 	wd, err := os.Getwd()
 	check(err)
-	fileNames := []string{"common.js", "generate_benchmark_means.js", "generate_benchmark_list.js",
-		"generate_benchmark_plot.js", "index.html", "geometric.html", "plot.html"}
+	fileNames := []string{"common.js", "generate_benchmark_list.js",
+		"generate_benchmark_plot.js", "index.html", "plot.html"}
 	for _, fileName := range fileNames {
 		cmd := exec.Command("cp", filepath.Join(wd, "www", fileName), deployRoot)
 		runWithStandardOutputs(cmd)

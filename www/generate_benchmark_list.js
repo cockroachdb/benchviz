@@ -20,7 +20,21 @@ function loadTestListFromJSON(callback) {
 
 function generateTestListHTML(directory, tests) {
     tests.sort();
+    if (directory == "sql") {
+	prioritizeImportantTests(tests);
+    }
     return _.values(tests).map((v) => `<a class="testName" href="/plot.html?directory=${directory}&test=${v}">${v}</a>`).join("<br/>");
+}
+
+function prioritizeImportantTests(testList) {
+    importantTests = ["Scan", "Delete", "Update", "Insert"];
+    $.each(importantTests, function (index, test) {
+	$.each(["_Cockroach-16", "Multinode_Cockroach-16"], function (index2, suffix) {
+	    for (var i = 1; i < 1001; i *= 10) {
+		testList.unshift("Benchmark" + test + i + suffix);
+	    }
+	});
+    });
 }
 
 function getDirectoryList(dirNameToTestList) {

@@ -26,7 +26,6 @@ func main() {
 	bPackages := filegenerator.RenderHistoricalBenchmarkResults(dirs)
 	filegenerator.GenerateJSONFiles(bPackages)
 	filegenerator.GenerateTestNameJSONFile(bPackages)
-	filegenerator.GenerateGeometricMeanJSONFile(bPackages, dirs)
 	filegenerator.CopyWWW()
 	filegenerator.PublishToAWS()
 }

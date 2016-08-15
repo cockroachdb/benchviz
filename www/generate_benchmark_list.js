@@ -38,7 +38,7 @@ function populateList(dirs, dirNameToTestList) {
     $template.hide()
     html = "";
     $.each(_.values(dirs), function (index, dir) {
-	html += '<a href="/geometric.html?directory=' + dir + '">' + dir + '</a><br/>';
+	html += dir + '<br/>';
 	var tests = _.values(dirNameToTestList[dir]);
 	var testsHTML = generateTestListHTML(dir, tests);
 	html += testsHTML + "<br/>";	

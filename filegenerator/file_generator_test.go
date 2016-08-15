@@ -19,7 +19,6 @@ package filegenerator_test
 import (
 	"encoding/json"
 	"io/ioutil"
-	"math"
 	"os"
 	"path/filepath"
 	"testing"
@@ -30,20 +29,6 @@ import (
 func check(err error) {
 	if err != nil {
 		panic(err)
-	}
-}
-
-func TestGetGeometricMean(t *testing.T) {
-	epsilon := .00001
-	testVector := []float64{3, 9, 27}
-	result := filegenerator.GetGeometricMean(testVector)
-	if math.Abs(result-9.0) > epsilon {
-		t.Errorf("Did not properly calculate geometric mean")
-	}
-	testVector = []float64{0, 9, 27}
-	result = filegenerator.GetGeometricMean(testVector)
-	if math.Abs(result-15.58846) > epsilon {
-		t.Errorf("Did not properly calculate geometric mean")
 	}
 }
 
@@ -105,45 +90,4 @@ func TestGenerateJSONFiles(t *testing.T) {
 		t.Errorf("JSON file did not match the data")
 	}
 
-}
-
-func TestGeometricMeanJSONFile(t *testing.T) {
-	epsilon := .00001
-	dirs := []string{"sql"}
-	stats1 := filegenerator.BenchStats{N: 1, A: 2, B: 3, M: 0}
-	stats2 := filegenerator.BenchStats{N: 1, A: 4, B: 9, M: 0}
-	stats3 := filegenerator.BenchStats{N: 1, A: 8, B: 27, M: 0}
-	results1 := filegenerator.BenchResults{"01-01-2015": stats1}
-	results2 := filegenerator.BenchResults{"01-01-2015": stats2}
-	results3 := filegenerator.BenchResults{"01-01-2015": stats3}
-	bmap := filegenerator.BenchTestMap{"BenchmarkSqlSampleTest1": results1, "BenchmarkSqlSampleTest2": results2, "BenchmarkSqlSampleTest3": results3}
-	bpackage := filegenerator.BenchPackages{"sql": bmap}
-	check(os.Setenv("BENCHDEPLOY", filepath.Join(os.TempDir(), "awsDeploy")))
-	setupAWSDeployDir()
-	defer removeAWSDeployDir()
-	filegenerator.GenerateGeometricMeanJSONFile(bpackage, dirs)
-	content, err := ioutil.ReadFile(filepath.Join(os.TempDir(), "awsDeploy", "geometric_means.json"))
-	if err != nil {
-		t.Errorf("Couldn't load JSON file")
-	}
-	var result map[string][]filegenerator.GeometricMeanData
-	err = json.Unmarshal(content, &result)
-	if err != nil {
-		t.Errorf("Couldn't load json")
-	}
-	if result["sql"][0].Date != "01-01-2015" {
-		t.Errorf("Wrong date")
-	}
-	if math.Abs(result["sql"][0].NMean-1.0) > epsilon {
-		t.Errorf("Wrong ns/op mean value")
-	}
-	if math.Abs(result["sql"][0].AMean-4.0) > epsilon {
-		t.Errorf("Wrong alloc/op mean value")
-	}
-	if math.Abs(result["sql"][0].BMean-9.0) > epsilon {
-		t.Errorf("Wrong B/op mean value")
-	}
-	if math.Abs(result["sql"][0].MMean-0.0) > epsilon {
-		t.Errorf("Wrong MB?s mean value")
-	}
 }
